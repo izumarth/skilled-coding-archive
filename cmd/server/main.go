@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -43,6 +45,28 @@ func (s *myServer) HelloServerStream(
 		time.Sleep(time.Second * 1)
 	}
 	return nil
+}
+
+func (s *myServer) HelloClientStream(
+	stream examplepb.GreetingService_HelloClientStreamServer,
+) error {
+	nameList := make([]string, 0)
+	for {
+		req, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			message := fmt.Sprintf("Hello %v", nameList)
+			return stream.SendAndClose(
+				&examplepb.HelloResponse{
+					Message: message,
+				},
+			)
+		}
+
+		if err != nil {
+			return err
+		}
+		nameList = append(nameList, req.GetName())
+	}
 }
 
 func NewMyServer() *myServer {
