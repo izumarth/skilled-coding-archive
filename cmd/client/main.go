@@ -11,8 +11,10 @@ import (
 	examplepb "izumarth_grpc/pkg/grpc"
 	"os"
 
+	_ "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -40,7 +42,7 @@ func main() {
 	client = examplepb.NewGreetingServiceClient(conn)
 
 	for {
-		fmt.Println("1: send Request")
+		fmt.Println("1: send Request(Error)")
 		fmt.Println("2: server streaming")
 		fmt.Println("3: client streaming")
 		fmt.Println("4: bidirectional streaming")
@@ -81,7 +83,13 @@ func Hello() {
 	}
 	res, err := client.Hello(context.Background(), req)
 	if err != nil {
-		fmt.Println(err)
+		if stat, ok := status.FromError(err); ok {
+			fmt.Printf("codes: %s\n", stat.Code())
+			fmt.Printf("message: %s\n", stat.Message())
+			fmt.Printf("details: %s\n", stat.Details())
+		} else {
+			fmt.Println(err)
+		}
 	} else {
 		fmt.Println(res.GetMessage())
 	}
