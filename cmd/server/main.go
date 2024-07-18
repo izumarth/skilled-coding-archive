@@ -13,11 +13,8 @@ import (
 
 	examplepb "izumarth_grpc/pkg/grpc"
 
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
-	"google.golang.org/grpc/status"
 )
 
 type myServer struct {
@@ -28,17 +25,19 @@ func (s *myServer) Hello(
 	ctx context.Context,
 	req *examplepb.HelloRequest,
 ) (*examplepb.HelloResponse, error) {
-	stat := status.New(codes.Unknown, "unkonw error occured")
-	stat, _ = stat.WithDetails(
-		&errdetails.DebugInfo{
-			Detail: "detail reason of err",
-		},
-	)
-	err := stat.Err()
-	return nil, err
-	// return &examplepb.HelloResponse{
-	// 	Message: fmt.Sprintf("Hello, %s!", req.GetName()),
-	// }, nil
+	/*
+		stat := status.New(codes.Unknown, "unkonw error occured")
+		stat, _ = stat.WithDetails(
+			&errdetails.DebugInfo{
+				Detail: "detail reason of err",
+			},
+		)
+		err := stat.Err()
+		return nil, err
+	*/
+	return &examplepb.HelloResponse{
+		Message: fmt.Sprintf("Hello, %s!", req.GetName()),
+	}, nil
 }
 
 func (s *myServer) HelloServerStream(
@@ -114,7 +113,16 @@ func main() {
 		panic(err)
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			myUnaryServerInterceptor(),
+			myUnaryServerInterceptor2(),
+		),
+		grpc.ChainStreamInterceptor(
+			myStreamServerInterceptor,
+			myStreamServerInterceptor2,
+		),
+	)
 
 	examplepb.RegisterGreetingServiceServer(s, NewMyServer())
 
