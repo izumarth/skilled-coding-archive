@@ -9,6 +9,10 @@ on:
 jobs:
 
   test:
+    defaults:
+      run:
+        working-directory: 02_sqlc_etc
+
     runs-on: ubuntu-latest
 
     services:
@@ -41,7 +45,7 @@ jobs:
         which migrate
 
     - name: Run migrations
-      run: migrate -path ./02_sqlc_etc/db/migration -database "postgresql://root:mysecretpassword@localhost:5432/simple_bank?sslmode=disable" -verbose up 
+      run: migrate -path ./db/migration -database "postgresql://root:mysecretpassword@localhost:5432/simple_bank?sslmode=disable" -verbose up 
 
     - name: Test
-      run: go test -v ./02_sqlc_etc/...
+      run: go test -v ./...
