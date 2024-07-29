@@ -6,21 +6,26 @@ import (
 	"fmt"
 )
 
-type Store struct {
+type Store interface {
+	Querier
+	TranferTx(ctx context.Context, arg TranferTxParams) (TransferTxResult, error)
+}
+
+type SQLStore struct {
 	*Queries
 	db *sql.DB
 }
 
 func NewStore(
 	db *sql.DB,
-) *Store {
-	return &Store{
+) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-func (store *Store) execTx(
+func (store *SQLStore) execTx(
 	ctx context.Context,
 	fn func(*Queries) error,
 ) error {
@@ -57,7 +62,7 @@ type TransferTxResult struct {
 
 var txKey = struct{}{}
 
-func (store *Store) TranferTx(
+func (store *SQLStore) TranferTx(
 	ctx context.Context,
 	arg TranferTxParams,
 ) (TransferTxResult, error) {
