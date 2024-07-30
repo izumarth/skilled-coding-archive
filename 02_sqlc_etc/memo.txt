@@ -5,9 +5,12 @@ docker exec -t postgres12 psql -U root
 
 
 brew install golang-migrate
-migrate create -ext sql -dir ./db/migration -seq init_schema
+migrate create -ext sql -dir ./ /migration -seq init_schema
 migrate -path ./db/migration -database "postgresql://root:mysecretpassword@localhost:5432/simple_bank?sslmode=disable" -verbose up
 docker container exec -it postgres12 /bin/sh
+\connect simple_bank
 
 brew uninstall kyleconroy/sqlc/sqlc
 brew install sqlc
+
+migrate create -ext sql -dir ./db/migration -seq add_users
