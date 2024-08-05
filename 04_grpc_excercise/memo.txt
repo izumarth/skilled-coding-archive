@@ -1,0 +1,8 @@
+# -I import
+# -go_out generate folder
+
+protoc -Igreet/proto --go_out=. --go-grpc_out=. --go_opt=module=github.com/izumarth/skilled-coding-archive/04-grpc-excercise --go-grpc_opt=module=github.com/izumarth/skilled-coding-archive/04-grpc-excercise greet/proto/dummy.proto
+
+
+# start server
+./bin/greet/server 
