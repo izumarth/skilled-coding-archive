@@ -15,3 +15,16 @@ message GreetResponse {
 service GreetService {
     rpc Greet (GreetRequest) returns (GreetResponse);
 }
+
+message SumRequest {
+    int64 number_one = 1;
+    int64 number_two = 2;
+}
+
+message SumResponse {
+    int64 result = 1;
+}
+
+service SumService {
+    rpc Sum (SumRequest) returns (SumResponse);
+}
