@@ -19,9 +19,13 @@ func main() {
 	}
 	defer conn.Close()
 
-	c := pb.NewGreetServiceClient(conn)
-	doGreet(c)
+	//c := pb.NewGreetServiceClient(conn)
+	// doGreet(c)
+	//doGreetManyTimes(c)
 
-	c_sum := pb.NewSumServiceClient(conn)
-	doSum(c_sum)
+	//c_sum := pb.NewSumServiceClient(conn)
+	//doSum(c_sum)
+
+	c := pb.NewPrimesServiceClient(conn)
+	doPrimse(c)
 }
