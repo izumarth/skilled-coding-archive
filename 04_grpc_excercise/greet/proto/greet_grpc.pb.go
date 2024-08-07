@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	GreetService_Greet_FullMethodName = "/greet.GreetService/Greet"
+	GreetService_Greet_FullMethodName          = "/greet.GreetService/Greet"
+	GreetService_GreetManyTimes_FullMethodName = "/greet.GreetService/GreetManyTimes"
 )
 
 // GreetServiceClient is the client API for GreetService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GreetServiceClient interface {
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
+	GreetManyTimes(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error)
 }
 
 type greetServiceClient struct {
@@ -47,11 +49,45 @@ func (c *greetServiceClient) Greet(ctx context.Context, in *GreetRequest, opts .
 	return out, nil
 }
 
+func (c *greetServiceClient) GreetManyTimes(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[0], GreetService_GreetManyTimes_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greetServiceGreetManyTimesClient{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GreetService_GreetManyTimesClient interface {
+	Recv() (*GreetResponse, error)
+	grpc.ClientStream
+}
+
+type greetServiceGreetManyTimesClient struct {
+	grpc.ClientStream
+}
+
+func (x *greetServiceGreetManyTimesClient) Recv() (*GreetResponse, error) {
+	m := new(GreetResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetServiceServer is the server API for GreetService service.
 // All implementations must embed UnimplementedGreetServiceServer
 // for forward compatibility
 type GreetServiceServer interface {
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
+	GreetManyTimes(*GreetRequest, GreetService_GreetManyTimesServer) error
 	mustEmbedUnimplementedGreetServiceServer()
 }
 
@@ -61,6 +97,9 @@ type UnimplementedGreetServiceServer struct {
 
 func (UnimplementedGreetServiceServer) Greet(context.Context, *GreetRequest) (*GreetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Greet not implemented")
+}
+func (UnimplementedGreetServiceServer) GreetManyTimes(*GreetRequest, GreetService_GreetManyTimesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GreetManyTimes not implemented")
 }
 func (UnimplementedGreetServiceServer) mustEmbedUnimplementedGreetServiceServer() {}
 
@@ -93,6 +132,27 @@ func _GreetService_Greet_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GreetService_GreetManyTimes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GreetRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GreetServiceServer).GreetManyTimes(m, &greetServiceGreetManyTimesServer{ServerStream: stream})
+}
+
+type GreetService_GreetManyTimesServer interface {
+	Send(*GreetResponse) error
+	grpc.ServerStream
+}
+
+type greetServiceGreetManyTimesServer struct {
+	grpc.ServerStream
+}
+
+func (x *greetServiceGreetManyTimesServer) Send(m *GreetResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // GreetService_ServiceDesc is the grpc.ServiceDesc for GreetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -105,7 +165,13 @@ var GreetService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GreetService_Greet_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GreetManyTimes",
+			Handler:       _GreetService_GreetManyTimes_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "greet.proto",
 }
 
@@ -197,5 +263,123 @@ var SumService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
+	Metadata: "greet.proto",
+}
+
+const (
+	PrimesService_Primes_FullMethodName = "/greet.PrimesService/Primes"
+)
+
+// PrimesServiceClient is the client API for PrimesService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PrimesServiceClient interface {
+	Primes(ctx context.Context, in *PrimesRequest, opts ...grpc.CallOption) (PrimesService_PrimesClient, error)
+}
+
+type primesServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPrimesServiceClient(cc grpc.ClientConnInterface) PrimesServiceClient {
+	return &primesServiceClient{cc}
+}
+
+func (c *primesServiceClient) Primes(ctx context.Context, in *PrimesRequest, opts ...grpc.CallOption) (PrimesService_PrimesClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &PrimesService_ServiceDesc.Streams[0], PrimesService_Primes_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &primesServicePrimesClient{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type PrimesService_PrimesClient interface {
+	Recv() (*PrimesResponse, error)
+	grpc.ClientStream
+}
+
+type primesServicePrimesClient struct {
+	grpc.ClientStream
+}
+
+func (x *primesServicePrimesClient) Recv() (*PrimesResponse, error) {
+	m := new(PrimesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// PrimesServiceServer is the server API for PrimesService service.
+// All implementations must embed UnimplementedPrimesServiceServer
+// for forward compatibility
+type PrimesServiceServer interface {
+	Primes(*PrimesRequest, PrimesService_PrimesServer) error
+	mustEmbedUnimplementedPrimesServiceServer()
+}
+
+// UnimplementedPrimesServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedPrimesServiceServer struct {
+}
+
+func (UnimplementedPrimesServiceServer) Primes(*PrimesRequest, PrimesService_PrimesServer) error {
+	return status.Errorf(codes.Unimplemented, "method Primes not implemented")
+}
+func (UnimplementedPrimesServiceServer) mustEmbedUnimplementedPrimesServiceServer() {}
+
+// UnsafePrimesServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PrimesServiceServer will
+// result in compilation errors.
+type UnsafePrimesServiceServer interface {
+	mustEmbedUnimplementedPrimesServiceServer()
+}
+
+func RegisterPrimesServiceServer(s grpc.ServiceRegistrar, srv PrimesServiceServer) {
+	s.RegisterService(&PrimesService_ServiceDesc, srv)
+}
+
+func _PrimesService_Primes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PrimesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(PrimesServiceServer).Primes(m, &primesServicePrimesServer{ServerStream: stream})
+}
+
+type PrimesService_PrimesServer interface {
+	Send(*PrimesResponse) error
+	grpc.ServerStream
+}
+
+type primesServicePrimesServer struct {
+	grpc.ServerStream
+}
+
+func (x *primesServicePrimesServer) Send(m *PrimesResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+// PrimesService_ServiceDesc is the grpc.ServiceDesc for PrimesService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PrimesService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "greet.PrimesService",
+	HandlerType: (*PrimesServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Primes",
+			Handler:       _PrimesService_Primes_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "greet.proto",
 }
