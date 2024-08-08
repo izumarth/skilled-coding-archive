@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion8
 const (
 	GreetService_Greet_FullMethodName          = "/greet.GreetService/Greet"
 	GreetService_GreetManyTimes_FullMethodName = "/greet.GreetService/GreetManyTimes"
+	GreetService_LongGreet_FullMethodName      = "/greet.GreetService/LongGreet"
 )
 
 // GreetServiceClient is the client API for GreetService service.
@@ -29,6 +30,7 @@ const (
 type GreetServiceClient interface {
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
 	GreetManyTimes(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error)
+	LongGreet(ctx context.Context, opts ...grpc.CallOption) (GreetService_LongGreetClient, error)
 }
 
 type greetServiceClient struct {
@@ -82,12 +84,48 @@ func (x *greetServiceGreetManyTimesClient) Recv() (*GreetResponse, error) {
 	return m, nil
 }
 
+func (c *greetServiceClient) LongGreet(ctx context.Context, opts ...grpc.CallOption) (GreetService_LongGreetClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[1], GreetService_LongGreet_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greetServiceLongGreetClient{ClientStream: stream}
+	return x, nil
+}
+
+type GreetService_LongGreetClient interface {
+	Send(*GreetRequest) error
+	CloseAndRecv() (*GreetResponse, error)
+	grpc.ClientStream
+}
+
+type greetServiceLongGreetClient struct {
+	grpc.ClientStream
+}
+
+func (x *greetServiceLongGreetClient) Send(m *GreetRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *greetServiceLongGreetClient) CloseAndRecv() (*GreetResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(GreetResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetServiceServer is the server API for GreetService service.
 // All implementations must embed UnimplementedGreetServiceServer
 // for forward compatibility
 type GreetServiceServer interface {
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
 	GreetManyTimes(*GreetRequest, GreetService_GreetManyTimesServer) error
+	LongGreet(GreetService_LongGreetServer) error
 	mustEmbedUnimplementedGreetServiceServer()
 }
 
@@ -100,6 +138,9 @@ func (UnimplementedGreetServiceServer) Greet(context.Context, *GreetRequest) (*G
 }
 func (UnimplementedGreetServiceServer) GreetManyTimes(*GreetRequest, GreetService_GreetManyTimesServer) error {
 	return status.Errorf(codes.Unimplemented, "method GreetManyTimes not implemented")
+}
+func (UnimplementedGreetServiceServer) LongGreet(GreetService_LongGreetServer) error {
+	return status.Errorf(codes.Unimplemented, "method LongGreet not implemented")
 }
 func (UnimplementedGreetServiceServer) mustEmbedUnimplementedGreetServiceServer() {}
 
@@ -153,6 +194,32 @@ func (x *greetServiceGreetManyTimesServer) Send(m *GreetResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _GreetService_LongGreet_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GreetServiceServer).LongGreet(&greetServiceLongGreetServer{ServerStream: stream})
+}
+
+type GreetService_LongGreetServer interface {
+	SendAndClose(*GreetResponse) error
+	Recv() (*GreetRequest, error)
+	grpc.ServerStream
+}
+
+type greetServiceLongGreetServer struct {
+	grpc.ServerStream
+}
+
+func (x *greetServiceLongGreetServer) SendAndClose(m *GreetResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *greetServiceLongGreetServer) Recv() (*GreetRequest, error) {
+	m := new(GreetRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetService_ServiceDesc is the grpc.ServiceDesc for GreetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -170,6 +237,11 @@ var GreetService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "GreetManyTimes",
 			Handler:       _GreetService_GreetManyTimes_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "LongGreet",
+			Handler:       _GreetService_LongGreet_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "greet.proto",
@@ -379,6 +451,131 @@ var PrimesService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "Primes",
 			Handler:       _PrimesService_Primes_Handler,
 			ServerStreams: true,
+		},
+	},
+	Metadata: "greet.proto",
+}
+
+const (
+	AverageService_Average_FullMethodName = "/greet.AverageService/Average"
+)
+
+// AverageServiceClient is the client API for AverageService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type AverageServiceClient interface {
+	Average(ctx context.Context, opts ...grpc.CallOption) (AverageService_AverageClient, error)
+}
+
+type averageServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewAverageServiceClient(cc grpc.ClientConnInterface) AverageServiceClient {
+	return &averageServiceClient{cc}
+}
+
+func (c *averageServiceClient) Average(ctx context.Context, opts ...grpc.CallOption) (AverageService_AverageClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &AverageService_ServiceDesc.Streams[0], AverageService_Average_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &averageServiceAverageClient{ClientStream: stream}
+	return x, nil
+}
+
+type AverageService_AverageClient interface {
+	Send(*AvrageRequest) error
+	CloseAndRecv() (*AverageResponse, error)
+	grpc.ClientStream
+}
+
+type averageServiceAverageClient struct {
+	grpc.ClientStream
+}
+
+func (x *averageServiceAverageClient) Send(m *AvrageRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *averageServiceAverageClient) CloseAndRecv() (*AverageResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(AverageResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// AverageServiceServer is the server API for AverageService service.
+// All implementations must embed UnimplementedAverageServiceServer
+// for forward compatibility
+type AverageServiceServer interface {
+	Average(AverageService_AverageServer) error
+	mustEmbedUnimplementedAverageServiceServer()
+}
+
+// UnimplementedAverageServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAverageServiceServer struct {
+}
+
+func (UnimplementedAverageServiceServer) Average(AverageService_AverageServer) error {
+	return status.Errorf(codes.Unimplemented, "method Average not implemented")
+}
+func (UnimplementedAverageServiceServer) mustEmbedUnimplementedAverageServiceServer() {}
+
+// UnsafeAverageServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AverageServiceServer will
+// result in compilation errors.
+type UnsafeAverageServiceServer interface {
+	mustEmbedUnimplementedAverageServiceServer()
+}
+
+func RegisterAverageServiceServer(s grpc.ServiceRegistrar, srv AverageServiceServer) {
+	s.RegisterService(&AverageService_ServiceDesc, srv)
+}
+
+func _AverageService_Average_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AverageServiceServer).Average(&averageServiceAverageServer{ServerStream: stream})
+}
+
+type AverageService_AverageServer interface {
+	SendAndClose(*AverageResponse) error
+	Recv() (*AvrageRequest, error)
+	grpc.ServerStream
+}
+
+type averageServiceAverageServer struct {
+	grpc.ServerStream
+}
+
+func (x *averageServiceAverageServer) SendAndClose(m *AverageResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *averageServiceAverageServer) Recv() (*AvrageRequest, error) {
+	m := new(AvrageRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// AverageService_ServiceDesc is the grpc.ServiceDesc for AverageService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var AverageService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "greet.AverageService",
+	HandlerType: (*AverageServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Average",
+			Handler:       _AverageService_Average_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "greet.proto",
