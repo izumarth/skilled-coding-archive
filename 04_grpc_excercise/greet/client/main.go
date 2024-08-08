@@ -22,10 +22,14 @@ func main() {
 	//c := pb.NewGreetServiceClient(conn)
 	// doGreet(c)
 	//doGreetManyTimes(c)
+	//doLongGreet(c)
 
 	//c_sum := pb.NewSumServiceClient(conn)
 	//doSum(c_sum)
 
-	c := pb.NewPrimesServiceClient(conn)
-	doPrimse(c)
+	//c := pb.NewPrimesServiceClient(conn)
+	//doPrimse(c)
+
+	c := pb.NewAverageServiceClient(conn)
+	doAverage(c)
 }

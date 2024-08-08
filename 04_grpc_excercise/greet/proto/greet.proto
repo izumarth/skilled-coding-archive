@@ -15,6 +15,7 @@ message GreetResponse {
 service GreetService {
     rpc Greet (GreetRequest) returns (GreetResponse);
     rpc GreetManyTimes (GreetRequest) returns (stream GreetResponse);
+    rpc LongGreet (stream GreetRequest) returns (GreetResponse);
 }
 
 message SumRequest {
@@ -40,4 +41,16 @@ message PrimesResponse {
 
 service PrimesService {
     rpc Primes (PrimesRequest) returns (stream PrimesResponse);
+}
+
+message AvrageRequest {
+    int64 number = 1;
+}
+
+message AverageResponse {
+    float result = 1;
+}
+
+service AverageService {
+    rpc Average (stream AvrageRequest) returns (AverageResponse);
 }

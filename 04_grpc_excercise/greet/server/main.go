@@ -14,6 +14,7 @@ type Server struct {
 	pb.GreetServiceServer
 	pb.SumServiceServer
 	pb.PrimesServiceServer
+	pb.AverageServiceServer
 }
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 	pb.RegisterGreetServiceServer(s, &Server{})
 	pb.RegisterSumServiceServer(s, &Server{})
 	pb.RegisterPrimesServiceServer(s, &Server{})
+	pb.RegisterAverageServiceServer(s, &Server{})
 
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
