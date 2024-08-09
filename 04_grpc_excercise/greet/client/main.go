@@ -19,7 +19,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	//c := pb.NewGreetServiceClient(conn)
+	// c := pb.NewGreetServiceClient(conn)
 	// doGreet(c)
 	//doGreetManyTimes(c)
 	//doLongGreet(c)
@@ -30,6 +30,10 @@ func main() {
 	//c := pb.NewPrimesServiceClient(conn)
 	//doPrimse(c)
 
-	c := pb.NewAverageServiceClient(conn)
-	doAverage(c)
+	// c := pb.NewAverageServiceClient(conn)
+	// doAverage(c)
+
+	c := pb.NewMaxServiceClient(conn)
+	doMax(c)
+
 }

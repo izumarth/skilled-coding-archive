@@ -22,6 +22,7 @@ const (
 	GreetService_Greet_FullMethodName          = "/greet.GreetService/Greet"
 	GreetService_GreetManyTimes_FullMethodName = "/greet.GreetService/GreetManyTimes"
 	GreetService_LongGreet_FullMethodName      = "/greet.GreetService/LongGreet"
+	GreetService_GreetEveryone_FullMethodName  = "/greet.GreetService/GreetEveryone"
 )
 
 // GreetServiceClient is the client API for GreetService service.
@@ -31,6 +32,7 @@ type GreetServiceClient interface {
 	Greet(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (*GreetResponse, error)
 	GreetManyTimes(ctx context.Context, in *GreetRequest, opts ...grpc.CallOption) (GreetService_GreetManyTimesClient, error)
 	LongGreet(ctx context.Context, opts ...grpc.CallOption) (GreetService_LongGreetClient, error)
+	GreetEveryone(ctx context.Context, opts ...grpc.CallOption) (GreetService_GreetEveryoneClient, error)
 }
 
 type greetServiceClient struct {
@@ -119,6 +121,38 @@ func (x *greetServiceLongGreetClient) CloseAndRecv() (*GreetResponse, error) {
 	return m, nil
 }
 
+func (c *greetServiceClient) GreetEveryone(ctx context.Context, opts ...grpc.CallOption) (GreetService_GreetEveryoneClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &GreetService_ServiceDesc.Streams[2], GreetService_GreetEveryone_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &greetServiceGreetEveryoneClient{ClientStream: stream}
+	return x, nil
+}
+
+type GreetService_GreetEveryoneClient interface {
+	Send(*GreetRequest) error
+	Recv() (*GreetResponse, error)
+	grpc.ClientStream
+}
+
+type greetServiceGreetEveryoneClient struct {
+	grpc.ClientStream
+}
+
+func (x *greetServiceGreetEveryoneClient) Send(m *GreetRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *greetServiceGreetEveryoneClient) Recv() (*GreetResponse, error) {
+	m := new(GreetResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetServiceServer is the server API for GreetService service.
 // All implementations must embed UnimplementedGreetServiceServer
 // for forward compatibility
@@ -126,6 +160,7 @@ type GreetServiceServer interface {
 	Greet(context.Context, *GreetRequest) (*GreetResponse, error)
 	GreetManyTimes(*GreetRequest, GreetService_GreetManyTimesServer) error
 	LongGreet(GreetService_LongGreetServer) error
+	GreetEveryone(GreetService_GreetEveryoneServer) error
 	mustEmbedUnimplementedGreetServiceServer()
 }
 
@@ -141,6 +176,9 @@ func (UnimplementedGreetServiceServer) GreetManyTimes(*GreetRequest, GreetServic
 }
 func (UnimplementedGreetServiceServer) LongGreet(GreetService_LongGreetServer) error {
 	return status.Errorf(codes.Unimplemented, "method LongGreet not implemented")
+}
+func (UnimplementedGreetServiceServer) GreetEveryone(GreetService_GreetEveryoneServer) error {
+	return status.Errorf(codes.Unimplemented, "method GreetEveryone not implemented")
 }
 func (UnimplementedGreetServiceServer) mustEmbedUnimplementedGreetServiceServer() {}
 
@@ -220,6 +258,32 @@ func (x *greetServiceLongGreetServer) Recv() (*GreetRequest, error) {
 	return m, nil
 }
 
+func _GreetService_GreetEveryone_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GreetServiceServer).GreetEveryone(&greetServiceGreetEveryoneServer{ServerStream: stream})
+}
+
+type GreetService_GreetEveryoneServer interface {
+	Send(*GreetResponse) error
+	Recv() (*GreetRequest, error)
+	grpc.ServerStream
+}
+
+type greetServiceGreetEveryoneServer struct {
+	grpc.ServerStream
+}
+
+func (x *greetServiceGreetEveryoneServer) Send(m *GreetResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *greetServiceGreetEveryoneServer) Recv() (*GreetRequest, error) {
+	m := new(GreetRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GreetService_ServiceDesc is the grpc.ServiceDesc for GreetService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -241,6 +305,12 @@ var GreetService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "LongGreet",
 			Handler:       _GreetService_LongGreet_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "GreetEveryone",
+			Handler:       _GreetService_GreetEveryone_Handler,
+			ServerStreams: true,
 			ClientStreams: true,
 		},
 	},
@@ -575,6 +645,129 @@ var AverageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "Average",
 			Handler:       _AverageService_Average_Handler,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "greet.proto",
+}
+
+const (
+	MaxService_Max_FullMethodName = "/greet.MaxService/Max"
+)
+
+// MaxServiceClient is the client API for MaxService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type MaxServiceClient interface {
+	Max(ctx context.Context, opts ...grpc.CallOption) (MaxService_MaxClient, error)
+}
+
+type maxServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewMaxServiceClient(cc grpc.ClientConnInterface) MaxServiceClient {
+	return &maxServiceClient{cc}
+}
+
+func (c *maxServiceClient) Max(ctx context.Context, opts ...grpc.CallOption) (MaxService_MaxClient, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &MaxService_ServiceDesc.Streams[0], MaxService_Max_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &maxServiceMaxClient{ClientStream: stream}
+	return x, nil
+}
+
+type MaxService_MaxClient interface {
+	Send(*MaxRequest) error
+	Recv() (*MaxResponse, error)
+	grpc.ClientStream
+}
+
+type maxServiceMaxClient struct {
+	grpc.ClientStream
+}
+
+func (x *maxServiceMaxClient) Send(m *MaxRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *maxServiceMaxClient) Recv() (*MaxResponse, error) {
+	m := new(MaxResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// MaxServiceServer is the server API for MaxService service.
+// All implementations must embed UnimplementedMaxServiceServer
+// for forward compatibility
+type MaxServiceServer interface {
+	Max(MaxService_MaxServer) error
+	mustEmbedUnimplementedMaxServiceServer()
+}
+
+// UnimplementedMaxServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedMaxServiceServer struct {
+}
+
+func (UnimplementedMaxServiceServer) Max(MaxService_MaxServer) error {
+	return status.Errorf(codes.Unimplemented, "method Max not implemented")
+}
+func (UnimplementedMaxServiceServer) mustEmbedUnimplementedMaxServiceServer() {}
+
+// UnsafeMaxServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MaxServiceServer will
+// result in compilation errors.
+type UnsafeMaxServiceServer interface {
+	mustEmbedUnimplementedMaxServiceServer()
+}
+
+func RegisterMaxServiceServer(s grpc.ServiceRegistrar, srv MaxServiceServer) {
+	s.RegisterService(&MaxService_ServiceDesc, srv)
+}
+
+func _MaxService_Max_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MaxServiceServer).Max(&maxServiceMaxServer{ServerStream: stream})
+}
+
+type MaxService_MaxServer interface {
+	Send(*MaxResponse) error
+	Recv() (*MaxRequest, error)
+	grpc.ServerStream
+}
+
+type maxServiceMaxServer struct {
+	grpc.ServerStream
+}
+
+func (x *maxServiceMaxServer) Send(m *MaxResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *maxServiceMaxServer) Recv() (*MaxRequest, error) {
+	m := new(MaxRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// MaxService_ServiceDesc is the grpc.ServiceDesc for MaxService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var MaxService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "greet.MaxService",
+	HandlerType: (*MaxServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Max",
+			Handler:       _MaxService_Max_Handler,
+			ServerStreams: true,
 			ClientStreams: true,
 		},
 	},
