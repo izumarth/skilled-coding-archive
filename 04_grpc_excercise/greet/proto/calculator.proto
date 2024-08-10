@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package= "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto";
+
+service CalculatorService {
+    rpc Max (stream MaxRequest) returns (stream MaxResponse);
+    rpc Primes (PrimesRequest) returns (stream PrimesResponse);
+    rpc Average (stream AvrageRequest) returns (AverageResponse);
+}
+
+message MaxRequest {
+    int64 number = 1;
+}
+
+message MaxResponse {
+    int64 result = 1;
+}
+
+message PrimesRequest {
+    int64 number_one = 1;
+}
+
+message PrimesResponse {
+    int64 result = 1;
+}
+
+message AvrageRequest {
+    int64 number = 1;
+}
+
+message AverageResponse {
+    float result = 1;
+}

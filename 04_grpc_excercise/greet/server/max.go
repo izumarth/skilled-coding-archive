@@ -7,7 +7,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func (s *Server) Max(stream pb.MaxService_MaxServer) error {
+func (s *Server) Max(stream pb.CalculatorService_MaxServer) error {
 	log.Printf("MaxService_MaxServer function was invoked")
 
 	max := int64(-1)

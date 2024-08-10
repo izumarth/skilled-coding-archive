@@ -7,7 +7,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func (s *Server) Average(stream pb.AverageService_AverageServer) error {
+func (s *Server) Average(stream pb.CalculatorService_AverageServer) error {
 	log.Println("Average function was invoked")
 
 	res := []int64{}

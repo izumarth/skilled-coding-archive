@@ -8,7 +8,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func doPrimse(c pb.PrimesServiceClient) {
+func doPrimse(c pb.CalculatorServiceClient) {
 	log.Println("doPrimes was invoked")
 
 	req := &pb.PrimesRequest{
