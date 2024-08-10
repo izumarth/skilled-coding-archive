@@ -162,3 +162,5 @@ server.csr
 server.key
 server.pem
 # End of https://www.toptal.com/developers/gitignore/api/macos,goland
+
+04_grpc_excercise/bin
