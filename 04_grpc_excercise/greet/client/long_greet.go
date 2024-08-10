@@ -6,6 +6,7 @@ import (
 	"time"
 
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
+	"google.golang.org/grpc/status"
 )
 
 func doLongGreet(c pb.GreetServiceClient) {
@@ -19,7 +20,12 @@ func doLongGreet(c pb.GreetServiceClient) {
 
 	stream, err := c.LongGreet(context.Background())
 	if err != nil {
-		log.Fatalf("Could not Long Great%v\n", err)
+		res, ok := status.FromError(err)
+		if ok {
+			log.Printf("Error Message From Server: %v", res.Message())
+		} else {
+			log.Fatalf("Could not Long Great%v\n", err)
+		}
 	}
 
 	for _, req := range reqs {

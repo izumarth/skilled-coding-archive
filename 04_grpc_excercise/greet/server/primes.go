@@ -6,7 +6,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func (s *Server) Primes(in *pb.PrimesRequest, stream pb.PrimesService_PrimesServer) error {
+func (s *Server) Primes(in *pb.PrimesRequest, stream pb.CalculatorService_PrimesServer) error {
 	log.Printf("Primes function was invoked with: %v\n", in)
 
 	factors := factorize(in.NumberOne)

@@ -12,10 +12,7 @@ var addr string = "0.0.0.0:50051"
 
 type Server struct {
 	pb.GreetServiceServer
-	pb.SumServiceServer
-	pb.PrimesServiceServer
-	pb.AverageServiceServer
-	pb.MaxServiceServer
+	pb.CalculatorServiceServer
 }
 
 func main() {
@@ -28,10 +25,7 @@ func main() {
 
 	s := grpc.NewServer()
 	pb.RegisterGreetServiceServer(s, &Server{})
-	pb.RegisterSumServiceServer(s, &Server{})
-	pb.RegisterPrimesServiceServer(s, &Server{})
-	pb.RegisterAverageServiceServer(s, &Server{})
-	pb.RegisterMaxServiceServer(s, &Server{})
+	pb.RegisterCalculatorServiceServer(s, &Server{})
 
 	if err = s.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)

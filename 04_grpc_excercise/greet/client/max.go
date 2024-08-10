@@ -9,7 +9,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func doMax(c pb.MaxServiceClient) {
+func doMax(c pb.CalculatorServiceClient) {
 	log.Println("doMax was invoked")
 
 	reqs := []*pb.MaxRequest{

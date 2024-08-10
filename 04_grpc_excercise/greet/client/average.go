@@ -8,7 +8,7 @@ import (
 	pb "github.com/izumarth/skilled-coding-archive/04-grpc-excercise/greet/proto"
 )
 
-func doAverage(c pb.AverageServiceClient) {
+func doAverage(c pb.CalculatorServiceClient) {
 	log.Println("doAverage was invoked")
 
 	reqs := []*pb.AvrageRequest{
