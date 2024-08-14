@@ -54,12 +54,12 @@ function App() {
     setModalOpen(false);
 
     const storedIds = JSON.parse(localStorage.getItem('selectedPlaces')) || [];
-    localStorage.setItem('selectedPlaces', JSON.stringify(...[storedIds.filter((id) => id !== selectedPlace.current)]));
+    localStorage.setItem('selectedPlaces', JSON.stringify(storedIds.filter((id) => id !== selectedPlace.current)));
   }, []);
 
   return (
     <>
-      <Modal open={modalOpen} onClose={handleRemovePlace}>
+      <Modal open={modalOpen} onClose={handleStopRemovePlace}>
         <DeleteConfirmation onCancel={handleStopRemovePlace} onConfirm={handleRemovePlace} />
       </Modal>
 
