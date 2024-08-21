@@ -7,6 +7,7 @@ import (
 	"net/http"
 )
 
+
 type templateData struct {
 	Data map[string]any
 }
@@ -14,7 +15,7 @@ type templateData struct {
 func (app *application) render(w http.ResponseWriter, t string, td *templateData) {
 	var tmpl *template.Template
 
-	// if we are using the template chache. try to get the template from our map
+	// if we are using the template cache, try to get the template from our map, stored in the receiver
 	if app.config.useCache {
 		if templateFromMap, ok := app.templateMap[t]; ok {
 			tmpl = templateFromMap
@@ -39,6 +40,7 @@ func (app *application) render(w http.ResponseWriter, t string, td *templateData
 		log.Println("Error executing template:", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 }
 
 func (app *application) buildTemplateFromDisk(t string) (*template.Template, error) {

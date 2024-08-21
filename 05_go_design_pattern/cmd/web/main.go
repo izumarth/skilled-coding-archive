@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const PORT = ":4000"
+const port = ":4000"
 
 type application struct {
 	templateMap map[string]*template.Template
@@ -29,7 +29,7 @@ func main() {
 	flag.Parse()
 
 	srv := &http.Server{
-		Addr:              PORT,
+		Addr:              port,
 		Handler:           app.routes(),
 		IdleTimeout:       30 * time.Second,
 		ReadTimeout:       30 * time.Second,
@@ -37,10 +37,11 @@ func main() {
 		WriteTimeout:      30 * time.Second,
 	}
 
-	fmt.Println("Starting web application on Port", PORT)
+	fmt.Println("Starting web application on port", port)
 
 	err := srv.ListenAndServe()
 	if err != nil {
-		log.Panicf("Cant Start Server!")
+		log.Fatal(err)
 	}
+
 }
