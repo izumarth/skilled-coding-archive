@@ -18,14 +18,36 @@ func (app *application) ShowPage(w http.ResponseWriter, r *http.Request) {
 	app.render(w, fmt.Sprintf("%s.page.gohtml", page), nil)
 }
 
-func (app *application) createDogFromFactory(w http.ResponseWriter, r *http.Request) {
+func (app *application) CreateDogFromFactory(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
 	_ = t.WriteJSON(w, http.StatusOK, pets.NewPet("Dog"))
 
 }
 
-func (app *application) createCatFromFactory(w http.ResponseWriter, r *http.Request) {
+func (app *application) CreateCatFromFactory(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
 	_ = t.WriteJSON(w, http.StatusOK, pets.NewPet("Cat"))
 
+}
+
+func (app *application) TestPatterns(w http.ResponseWriter, r *http.Request) {
+	app.render(w, "test.page.gohtml", nil)
+}
+
+func (app *application) CreateDogFromAbstractFactory(w http.ResponseWriter, r *http.Request) {
+	var t toolbox.Tools
+	dog, err := pets.NewPetFromAbstractFactroy("dog")
+	if err != nil {
+		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
+	}
+	_ = t.WriteJSON(w, http.StatusOK, dog)
+}
+
+func (app *application) CreateCatFromAbstractFactory(w http.ResponseWriter, r *http.Request) {
+	var t toolbox.Tools
+	cat, err := pets.NewPetFromAbstractFactroy("cat")
+	if err != nil {
+		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
+	}
+	_ = t.WriteJSON(w, http.StatusOK, cat)
 }
