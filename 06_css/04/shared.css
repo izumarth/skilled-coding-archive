@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+html {
+    margin: 0px
+}
+
 body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
@@ -9,8 +13,12 @@ body {
 
 .main-header {
     width: 100%;
+    position: fixed;
     background: #2ddf5c;
+    top: 0;
+    left: 0;
     padding: 8px 16px;
+    z-index: 1;
 }
 
 .main-header > div {
