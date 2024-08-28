@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-breeders/configuration"
 	"go-breeders/models"
 	"os"
 	"testing"
@@ -13,7 +14,7 @@ func TestMain(m *testing.M) {
 	testAdapter := &RemoteService{Remote: testBackend}
 
 	testApp = application{
-		Models:     *models.New(nil),
+		App:        configuration.New(nil),
 		catService: testAdapter,
 	}
 
