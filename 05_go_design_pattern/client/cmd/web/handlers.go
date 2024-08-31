@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-breeders/pets"
 	"net/http"
+	"net/url"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/tsawler/toolbox"
@@ -84,10 +85,31 @@ func (app *application) CreateDogWithBuilder(w http.ResponseWriter, r *http.Requ
 func (app *application) GetAllCatBreeds(w http.ResponseWriter, r *http.Request) {
 	var t toolbox.Tools
 
-	catBreeds, err := app.catService.GetAllCatBreeds()
+	catBreeds, err := app.App.CatService.GetAllCatBreeds()
 	if err != nil {
 		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
 	}
 
 	_ = t.WriteJSON(w, http.StatusOK, catBreeds)
+}
+
+func (app *application) AnimalFromAbstractFactory(w http.ResponseWriter, r *http.Request) {
+	// Setup toolbox
+	var t toolbox.Tools
+
+	// GEt Species form URL itself.
+	species := chi.URLParam(r, "species")
+
+	// Get breed from the URL
+	b := chi.URLParam(r, "breed")
+	breed, _ := url.QueryUnescape(b)
+
+	// Create a pet from abstract factory
+	pet, err := pets.NewPetWithBreedFromAbstractFactroy(species, breed)
+	if err != nil {
+		_ = t.ErrorJSON(w, err, http.StatusBadRequest)
+	}
+
+	// Write the result as JSON
+	_ = t.WriteJSON(w, http.StatusOK, pet)
 }
