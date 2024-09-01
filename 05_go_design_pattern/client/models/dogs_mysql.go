@@ -92,3 +92,31 @@ func (m *mySqlRepository) GetBreedByName(b string) (*DogBreed, error) {
 
 	return &dogBreed, nil
 }
+
+func (m *mySqlRepository) GetDogOfMonthById(id int) (*DogOfMonth, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT 
+				id, 
+				video, 
+				image
+			FROM 
+				dog_of_month
+			WHERE
+				id = ?`
+
+	row := m.DB.QueryRowContext(ctx, query, id)
+	var dog DogOfMonth
+
+	err := row.Scan(
+		&dog.ID,
+		&dog.Video,
+		&dog.Image,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dog, nil
+}
