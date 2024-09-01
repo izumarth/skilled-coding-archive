@@ -7,3 +7,7 @@ func (m *testRepository) AllDogBreeds() ([]*DogBreed, error) {
 func (m *testRepository) GetBreedByName(b string) (*DogBreed, error) {
 	return nil, nil
 }
+
+func (m *testRepository) GetDogOfMonthById(id int) (*DogOfMonth, error) {
+	return nil, nil
+}
