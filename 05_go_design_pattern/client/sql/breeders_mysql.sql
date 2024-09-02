@@ -19,6 +19,15 @@
 -- Table structure for table `breeders`
 --
 
+
+DROP TABLE IF EXISTS `dog_of_month`;
+CREATE TABLE `dog_of_month` (
+                                `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+                                `image` varchar(512) NOT NULL,
+                                `video` varchar(512) NOT NULL,
+                                PRIMARY KEY (`id`)
+) ;
+
 DROP TABLE IF EXISTS `breeders`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
