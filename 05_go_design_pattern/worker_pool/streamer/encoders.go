@@ -1,7 +1,7 @@
 package streamer
 
 type Encoder interface {
-	EncodeToMP4(v *Video, baseFileName string)
+	EncodeToMP4(v *Video, baseFileName string) error
 }
 
 type VideoEncoder struct{}
