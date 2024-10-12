@@ -35,11 +35,11 @@ export default function EventForm({ inputData, onSubmit, children }) {
 
       {isPending && <p>Loading Select images...</p>}
       {isError && <ErrorBlock title="Failed to load select images" message="Please try again" />}
-      {
+      {!isPending && (
         <div className="control">
           <ImagePicker images={data} onSelect={handleSelectImage} selectedImage={selectedImage} />
         </div>
-      }
+      )}
 
       <p className="control">
         <label htmlFor="description">Description</label>
