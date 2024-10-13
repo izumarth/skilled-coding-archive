@@ -2,13 +2,20 @@ import { QueryClient } from '@tanstack/react-query';
 
 export const queryClient = new QueryClient();
 
-export async function fetchEvents({ signal, searchTerm }) {
+export async function fetchEvents({ signal, searchTerm, max }) {
   console.log(searchTerm);
-  let url = 'http://localhost:3000/events';
+  const baseUrl = 'http://localhost:3000/events';
+  const params = new URLSearchParams();
 
   if (searchTerm) {
-    url += '?search=' + searchTerm;
+    params.append('search', searchTerm);
   }
+  
+  if (max) {
+    params.append('max', max);
+  }
+
+  const url = params.toString() ? `${baseUrl}?${params.toString()}` : baseUrl;
 
   const response = await fetch(url, { signal: signal });
 
@@ -23,7 +30,6 @@ export async function fetchEvents({ signal, searchTerm }) {
 
   return events;
 }
-
 
 export async function createNewEvent(eventData) {
   const response = await fetch(`http://localhost:3000/events`, {
@@ -76,7 +82,6 @@ export async function fetchEvent({ id, signal }) {
   return event;
 }
 
-
 export async function deleteEvent({ id }) {
   const response = await fetch(`http://localhost:3000/events/${id}`, {
     method: 'DELETE',
@@ -84,6 +89,25 @@ export async function deleteEvent({ id }) {
 
   if (!response.ok) {
     const error = new Error('An error occurred while deleting the event');
+    error.code = response.status;
+    error.info = await response.json();
+    throw error;
+  }
+
+  return response.json();
+}
+
+export async function updateEvent({ id, event }) {
+  const response = await fetch(`http://localhost:3000/events/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify({ event }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error('An error occurred while updating the event');
     error.code = response.status;
     error.info = await response.json();
     throw error;
